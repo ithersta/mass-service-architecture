@@ -112,20 +112,10 @@ private fun LazyListScope.sourcesTable(sources: List<EventCalendar.SourceRow>) {
     items(sources) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Text("И${it.index}", modifier = Modifier.weight(indexWeight))
-            AnimatedTableCell(text = it.time?.toString()?.take(8) ?: "–", weight = otherWeights)
+            TimeCell(it.time, otherWeights)
             AnimatedTableCell(text = it.requestCount.toString(), weight = otherWeights)
             AnimatedTableCell(text = it.deniedRequestCount.toString(), weight = otherWeights)
         }
-    }
-}
-
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-private fun RowScope.AnimatedTableCell(text: String, weight: Float) {
-    AnimatedContent(targetState = text, modifier = Modifier.weight(weight), transitionSpec = {
-        fadeIn() + slideInVertically { -it/2 } with fadeOut() + slideOutVertically { it/2 }
-    }) {
-        Text(text = it)
     }
 }
 
@@ -154,7 +144,7 @@ private fun LazyListScope.devicesTable(sources: List<EventCalendar.DeviceRow>) {
     items(sources) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Text("П${it.index}", modifier = Modifier.weight(indexWeight))
-            AnimatedTableCell(it.time?.toString()?.take(8) ?: "–", otherWeights)
+            TimeCell(it.time, otherWeights)
             Icon(
                 imageVector = if (it.isFree) Icons.Default.Check else Icons.Default.Close,
                 contentDescription = null,
@@ -191,8 +181,23 @@ private fun LazyListScope.bufferTable(sources: List<EventCalendar.BufferRow>) {
     items(sources) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(it.index.toString(), modifier = Modifier.weight(indexWeight))
-            AnimatedTableCell(it.time?.toString()?.take(8) ?: "–", otherWeights)
+            TimeCell(it.time, otherWeights)
             AnimatedTableCell(it.sourceIndex?.toString() ?: "–", otherWeights)
         }
+    }
+}
+
+@Composable
+private fun RowScope.TimeCell(time: Double?, weight: Float) {
+    AnimatedTableCell(text = time?.let { "%.4f".format(it) } ?: "–", weight = weight)
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun RowScope.AnimatedTableCell(text: String, weight: Float) {
+    AnimatedContent(targetState = text, modifier = Modifier.weight(weight), transitionSpec = {
+        fadeIn() + slideInVertically { -it / 2 } with fadeOut() + slideOutVertically { it / 2 }
+    }) {
+        Text(text = it)
     }
 }
