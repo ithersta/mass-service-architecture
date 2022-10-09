@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
                     sourceCount = 6,
                     deviceCount = 3,
                     bufferSize = 5,
-                    sourceIntensity = 1.0,
+                    sourceIntensity = 0.5,
                     deviceProcessingTime = 1.0..2.0
                 ))
             }

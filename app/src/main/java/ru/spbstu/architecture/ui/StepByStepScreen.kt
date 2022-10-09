@@ -1,10 +1,19 @@
 package ru.spbstu.architecture.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.with
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -51,16 +60,15 @@ fun StepByStepScreen(
             )
         }
     ) { padding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
             val state by viewModel.state.collectAsState()
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f), contentPadding = PaddingValues(16.dp)
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 80.dp)
             ) {
                 sourcesTable(state.sources)
                 item { Spacer(modifier = Modifier.size(24.dp)) }
@@ -71,7 +79,7 @@ fun StepByStepScreen(
             Button(
                 onClick = viewModel::step, modifier = Modifier
                     .padding(16.dp)
-                    .align(Alignment.End)
+                    .align(Alignment.BottomEnd)
             ) {
                 Text(text = "Сделать шаг")
             }
@@ -79,19 +87,21 @@ fun StepByStepScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 private fun LazyListScope.sourcesTable(sources: List<EventCalendar.SourceRow>) {
     val indexWeight = 0.3f
     val otherWeights = 1f
     stickyHeader {
-        Column(modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .padding(bottom = 16.dp)) {
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(bottom = 8.dp)
+        ) {
             Text(text = "Источники", style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.size(8.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
                 ProvideTextStyle(value = MaterialTheme.typography.titleSmall) {
-                    Spacer(modifier = Modifier.weight(indexWeight))
+                    Text("№", modifier = Modifier.weight(indexWeight))
                     Text("Время", modifier = Modifier.weight(otherWeights))
                     Text("Заявки", modifier = Modifier.weight(otherWeights))
                     Text("Отказы", modifier = Modifier.weight(otherWeights))
@@ -102,15 +112,20 @@ private fun LazyListScope.sourcesTable(sources: List<EventCalendar.SourceRow>) {
     items(sources) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Text("И${it.index}", modifier = Modifier.weight(indexWeight))
-            Text(
-                it.time?.toString() ?: "–",
-                modifier = Modifier.weight(otherWeights),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(it.requestCount.toString(), modifier = Modifier.weight(otherWeights))
-            Text(it.deniedRequestCount.toString(), modifier = Modifier.weight(otherWeights))
+            AnimatedTableCell(text = it.time?.toString()?.take(8) ?: "–", weight = otherWeights)
+            AnimatedTableCell(text = it.requestCount.toString(), weight = otherWeights)
+            AnimatedTableCell(text = it.deniedRequestCount.toString(), weight = otherWeights)
         }
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun RowScope.AnimatedTableCell(text: String, weight: Float) {
+    AnimatedContent(targetState = text, modifier = Modifier.weight(weight), transitionSpec = {
+        fadeIn() + slideInVertically { -it/2 } with fadeOut() + slideOutVertically { it/2 }
+    }) {
+        Text(text = it)
     }
 }
 
@@ -119,14 +134,16 @@ private fun LazyListScope.devicesTable(sources: List<EventCalendar.DeviceRow>) {
     val indexWeight = 0.3f
     val otherWeights = 1f
     stickyHeader {
-        Column(modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .padding(bottom = 16.dp)) {
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(bottom = 8.dp)
+        ) {
             Text(text = "Приборы", style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.size(8.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
                 ProvideTextStyle(value = MaterialTheme.typography.titleSmall) {
-                    Spacer(modifier = Modifier.weight(indexWeight))
+                    Text("№", modifier = Modifier.weight(indexWeight))
                     Text("Время", modifier = Modifier.weight(otherWeights))
                     Text("Свободен", modifier = Modifier.weight(otherWeights))
                     Text("Заявки", modifier = Modifier.weight(otherWeights))
@@ -137,12 +154,7 @@ private fun LazyListScope.devicesTable(sources: List<EventCalendar.DeviceRow>) {
     items(sources) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Text("П${it.index}", modifier = Modifier.weight(indexWeight))
-            Text(
-                it.time?.toString() ?: "–",
-                modifier = Modifier.weight(otherWeights),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            AnimatedTableCell(it.time?.toString()?.take(8) ?: "–", otherWeights)
             Icon(
                 imageVector = if (it.isFree) Icons.Default.Check else Icons.Default.Close,
                 contentDescription = null,
@@ -150,7 +162,7 @@ private fun LazyListScope.devicesTable(sources: List<EventCalendar.DeviceRow>) {
                     .weight(otherWeights)
                     .height(16.dp)
             )
-            Text(it.requestCount.toString(), modifier = Modifier.weight(otherWeights))
+            AnimatedTableCell(it.requestCount.toString(), otherWeights)
         }
     }
 }
@@ -160,14 +172,16 @@ private fun LazyListScope.bufferTable(sources: List<EventCalendar.BufferRow>) {
     val indexWeight = 0.3f
     val otherWeights = 1f
     stickyHeader {
-        Column(modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .padding(bottom = 16.dp)) {
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(bottom = 8.dp)
+        ) {
             Text(text = "Буфер", style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.size(8.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
                 ProvideTextStyle(value = MaterialTheme.typography.titleSmall) {
-                    Spacer(modifier = Modifier.weight(indexWeight))
+                    Text("№", modifier = Modifier.weight(indexWeight))
                     Text("Время", modifier = Modifier.weight(otherWeights))
                     Text("Источник", modifier = Modifier.weight(otherWeights))
                 }
@@ -177,13 +191,8 @@ private fun LazyListScope.bufferTable(sources: List<EventCalendar.BufferRow>) {
     items(sources) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(it.index.toString(), modifier = Modifier.weight(indexWeight))
-            Text(
-                it.time?.toString() ?: "–",
-                modifier = Modifier.weight(otherWeights),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(it.sourceIndex?.toString() ?: "–", modifier = Modifier.weight(otherWeights))
+            AnimatedTableCell(it.time?.toString()?.take(8) ?: "–", otherWeights)
+            AnimatedTableCell(it.sourceIndex?.toString() ?: "–", otherWeights)
         }
     }
 }
