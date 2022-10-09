@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.devtools.ksp") version "1.7.10-1.0.6"
+    kotlin("plugin.serialization") version "1.7.10"
 }
 
 android {
@@ -43,6 +45,13 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    applicationVariants.all {
+        kotlin.sourceSets {
+            getByName(name) {
+                kotlin.srcDir("build/generated/ksp/$name/kotlin")
+            }
+        }
+    }
 }
 
 dependencies {
@@ -54,6 +63,9 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
     implementation("androidx.compose.material3:material3:1.0.0-rc01")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
+    implementation("io.github.raamcosta.compose-destinations:core:1.6.20-beta")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+    ksp("io.github.raamcosta.compose-destinations:ksp:1.6.20-beta")
     debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
     debugImplementation("androidx.compose.ui:ui-test-manifest:$composeVersion")
 }

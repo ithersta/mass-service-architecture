@@ -6,7 +6,7 @@ import ru.spbstu.architecture.simulation.beingProcessed
 import ru.spbstu.architecture.simulation.processed
 import kotlin.random.Random
 
-class Device(val index: Int, private val processingTime: ClosedFloatingPointRange<Double>) : HasNextEvent {
+class Device(val index: Int, private val processingTime: Pair<Double, Double>) : HasNextEvent {
     private val random = Random(seed = index)
     var request: Request.BeingProcessed? = null
         private set
@@ -19,8 +19,8 @@ class Device(val index: Int, private val processingTime: ClosedFloatingPointRang
         assert(isFree())
         this.request = request
         nextEventTime = request.leftBufferAt + random.nextDouble(
-            from = processingTime.start,
-            until = processingTime.endInclusive
+            from = processingTime.first,
+            until = processingTime.second
         )
     }
 

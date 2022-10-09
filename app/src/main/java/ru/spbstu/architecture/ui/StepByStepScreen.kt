@@ -44,10 +44,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ru.spbstu.architecture.simulation.Config
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ramcosta.composedestinations.annotation.Destination
 import ru.spbstu.architecture.simulation.Event
 import ru.spbstu.architecture.simulation.EventCalendar
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@Destination
 @Composable
 fun StepByStepScreen(
     config: Config,

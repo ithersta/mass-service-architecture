@@ -6,9 +6,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import com.ramcosta.composedestinations.DestinationsNavHost
 import ru.spbstu.architecture.simulation.Config
 import ru.spbstu.architecture.ui.theme.ArchitectureTheme
 
@@ -17,13 +20,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ArchitectureTheme {
-                StepByStepScreen(config = Config(
-                    sourceCount = 6,
-                    deviceCount = 3,
-                    bufferSize = 5,
-                    sourceIntensity = 0.5,
-                    deviceProcessingTime = 1.0..2.0
-                ))
+                Surface(color = MaterialTheme.colorScheme.background) {
+                    DestinationsNavHost(navGraph = NavGraphs.root)
+                }
             }
         }
     }
