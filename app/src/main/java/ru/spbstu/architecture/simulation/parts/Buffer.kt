@@ -10,13 +10,26 @@ class Buffer(size: Int) {
     fun put(request: Request.Waiting): Request.Denied? {
         val initialIndex = index
         while (array[index] != null) {
-            index = (index + 1) % array.size
+            incrementIndex()
             if (initialIndex == index) break
         }
-        return array[index]?.denied(request.producedAt).also { array[index] = request }
+        return array[index]?.denied(request.producedAt).also {
+            array[index] = request
+            incrementIndex()
+        }
     }
 
     fun pop(): Request.Waiting? {
-        return array.filterNotNull().minByOrNull { it.producedAt }
+        return array.withIndex()
+            .filter { it.value != null }
+            .minByOrNull { it.value!!.producedAt }
+            ?.let { (index, value) ->
+                array[index] = null
+                value
+            }
+    }
+
+    private fun incrementIndex() {
+        index = (index + 1) % array.size
     }
 }
