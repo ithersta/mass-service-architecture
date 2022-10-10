@@ -36,7 +36,6 @@ class Simulator(private val config: Config) {
             val freeDevice = devices.firstOrNull { it.isFree() } ?: break
             val waitingRequest = buffer.pop() ?: break
             val request = waitingRequest.beingProcessed(freeDevice.index, event.at)
-            stats.registerBeingProcessedRequest(request)
             freeDevice.processRequest(request)
         }
     }
@@ -46,7 +45,7 @@ class Simulator(private val config: Config) {
             sources = sources.map { source ->
                 EventCalendar.SourceRow(
                     index = source.index,
-                    time = stats.timeBySource[source.index],
+                    time = source.nextEventTime,
                     requestCount = stats.emittedRequestCountBySource[source.index] ?: 0,
                     deniedRequestCount = stats.deniedRequestCountBySource[source.index] ?: 0
                 )
@@ -54,7 +53,7 @@ class Simulator(private val config: Config) {
             devices = devices.map { device ->
                 EventCalendar.DeviceRow(
                     index = device.index,
-                    time = stats.timeByDevice[device.index],
+                    time = device.nextEventTime,
                     isFree = device.isFree(),
                     requestCount = stats.processedRequestCountByDevice[device.index] ?: 0
                 )
