@@ -44,9 +44,12 @@ fun MainScreen(navigator: DestinationsNavigator) {
         var deviceCountText by rememberSaveable { mutableStateOf("3") }
         var bufferSizeText by rememberSaveable { mutableStateOf("5") }
         var sourceIntensityText by rememberSaveable { mutableStateOf("0.5") }
-        var deviceProcessingTimeStartText by rememberSaveable { mutableStateOf("1.0") }
-        var deviceProcessingTimeEndText by rememberSaveable { mutableStateOf("2.0") }
+        var deviceProcessingTimeText by rememberSaveable { mutableStateOf("1.0-2.0") }
         val config = run {
+            val times = deviceProcessingTimeText
+                .split("-")
+                .map { it.toDoubleOrNull() ?: return@run null }
+                .takeIf { it.size == 2 } ?: return@run null
             Config(
                 sourceCount = sourceCountText.toIntOrNull()?.takeIf { it in 1..100 }
                     ?: return@run null,
@@ -56,7 +59,8 @@ fun MainScreen(navigator: DestinationsNavigator) {
                     ?: return@run null,
                 sourceIntensity = sourceIntensityText.toDoubleOrNull()?.takeIf { it in 0.0..10.0 }
                     ?: return@run null,
-                deviceProcessingTime = 1.0 to 2.0
+                deviceProcessingTime = (times[0] to times[1]).takeIf { it.first < it.second }
+                    ?: return@run null
             )
         }
         Column(
@@ -88,6 +92,12 @@ fun MainScreen(navigator: DestinationsNavigator) {
                 value = sourceIntensityText,
                 onValueChange = { sourceIntensityText = it },
                 label = { Text("Интенсивность источников") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+            )
+            OutlinedTextField(
+                value = deviceProcessingTimeText,
+                onValueChange = { deviceProcessingTimeText = it },
+                label = { Text("Время обслуживания") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
             )
             config?.let {
