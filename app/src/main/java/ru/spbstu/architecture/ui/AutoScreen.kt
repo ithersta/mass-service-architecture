@@ -58,7 +58,7 @@ enum class Tabs {
     abstract fun getPlots(result: AutoSimulator.Result): AutoSimulator.Result.Plots
 }
 
-enum class Plots {
+enum class PlotType {
     AverageUtilization {
         override val title = "Средняя загруженность"
         override fun getPlot(plots: AutoSimulator.Result.Plots) = plots.averageUtilization
@@ -124,14 +124,14 @@ fun AutoScreen(
                     AnimatedContent(targetState = selectedTab) { selectedTab ->
                         val plots = selectedTab.getPlots(state)
                         Column {
-                            Plots.values().forEach {
+                            PlotType.values().forEach { plotType ->
                                 Text(
-                                    text = it.title,
+                                    text = plotType.title,
                                     style = MaterialTheme.typography.titleMedium,
                                     modifier = Modifier.padding(16.dp)
                                 )
                                 Plot(
-                                    points = it.getPlot(plots),
+                                    points = plotType.getPlot(plots),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .weight(1f)
