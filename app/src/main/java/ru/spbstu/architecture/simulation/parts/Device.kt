@@ -6,8 +6,12 @@ import ru.spbstu.architecture.simulation.beingProcessed
 import ru.spbstu.architecture.simulation.processed
 import kotlin.random.Random
 
-class Device(val index: Int, private val processingTime: Pair<Double, Double>) : HasNextEvent {
-    private val random = Random(seed = index)
+class Device(
+    val index: Int,
+    private val processingTime: Pair<Double, Double>,
+    seed: Int
+) : HasNextEvent {
+    private val random = Random(seed = index + seed)
     var request: Request.BeingProcessed? = null
         private set
     override var nextEventTime: Double? = null

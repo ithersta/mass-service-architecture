@@ -5,12 +5,14 @@ import ru.spbstu.architecture.simulation.parts.Device
 import ru.spbstu.architecture.simulation.parts.Source
 
 class Simulator(private val config: Config) {
-    private val sources = List(config.sourceCount) { Source(it, config.sourceIntensity) }
-    private val devices = List(config.deviceCount) { Device(it, config.deviceProcessingTime) }
+    private val seed = config.hashCode()
+    private val sources = List(config.sourceCount) { Source(it, config.sourceIntensity, seed) }
+    private val devices = List(config.deviceCount) { Device(it, config.deviceProcessingTime, seed) }
     private val buffer = Buffer(config.bufferSize)
     private val deniedRequests = mutableListOf<Request.Denied>()
     private val processedRequests = mutableListOf<Request.Processed>()
     private var emittedRequestCount = 0
+    private var lastTime: Double = 0.0
 
     fun step(maxRequests: Int): Boolean {
         if (emittedRequestCount >= maxRequests) {
@@ -21,6 +23,7 @@ class Simulator(private val config: Config) {
             .filter { it.nextEventTime != null }
             .minByOrNull { it.nextEventTime!! }
             ?.onEvent() ?: return false
+        lastTime = event.at
 
         when (event) {
             is Event.RequestEmitted -> {

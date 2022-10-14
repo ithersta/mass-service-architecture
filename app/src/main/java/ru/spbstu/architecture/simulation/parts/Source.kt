@@ -7,10 +7,11 @@ import kotlin.random.Random
 
 class Source(
     val index: Int,
-    intensity: Double
+    intensity: Double,
+    seed: Int
 ) : HasNextEvent {
     private val poissonIterator =
-        poissonSequence(Random(seed = index), intensity).iterator().withIndex()
+        poissonSequence(Random(seed = index + seed), intensity).iterator().withIndex()
     private var nextEvent: IndexedValue<Double>? = poissonIterator.next()
     override val nextEventTime: Double?
         get() = nextEvent?.value
