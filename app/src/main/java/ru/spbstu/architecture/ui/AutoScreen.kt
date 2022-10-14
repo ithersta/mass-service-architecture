@@ -45,27 +45,41 @@ import io.github.pt2121.collage.d2v.path
 import io.github.pt2121.collage.rememberCollagePainter
 import ru.spbstu.architecture.simulation.AutoSimulator
 
-sealed interface Tabs {
-    val name: String
-    fun getPlots(result: AutoSimulator.Result): AutoSimulator.Result.Plots
-
-    object Sources : Tabs {
-        override val name = "Источники"
+enum class Tabs {
+    Sources {
+        override val title = "Источники"
         override fun getPlots(result: AutoSimulator.Result) = result.varyingSourcePlots
-    }
-
-    object Devices : Tabs {
-        override val name = "Приборы"
+    },
+    Devices {
+        override val title = "Приборы"
         override fun getPlots(result: AutoSimulator.Result) = result.varyingDevicePlots
-    }
-
-    object Buffer : Tabs {
-        override val name = "Буфер"
+    },
+    Buffer {
+        override val title = "Буфер"
         override fun getPlots(result: AutoSimulator.Result) = result.varyingBufferPlots
-    }
+    };
+
+    abstract val title: String
+    abstract fun getPlots(result: AutoSimulator.Result): AutoSimulator.Result.Plots
 }
 
-private val tabs = listOf(Tabs.Sources, Tabs.Devices, Tabs.Buffer)
+enum class Plots {
+    AverageUtilization {
+        override val title = "Средняя загруженность"
+        override fun getPlot(plots: AutoSimulator.Result.Plots) = plots.averageUtilization
+    },
+    AverageTimeSpent {
+        override val title = "Среднее время в системе"
+        override fun getPlot(plots: AutoSimulator.Result.Plots) = plots.averageTimeSpent
+    },
+    DenyProbability {
+        override val title = "Вероятность отказа"
+        override fun getPlot(plots: AutoSimulator.Result.Plots) = plots.denyProbability
+    };
+
+    abstract val title: String
+    abstract fun getPlot(plots: AutoSimulator.Result.Plots): List<Pair<Int, Double>>
+}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
@@ -86,17 +100,17 @@ fun AutoScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            var selectedTab by remember { mutableStateOf(tabs.first()) }
+            var selectedTab by remember { mutableStateOf(Tabs.values().first()) }
             TabRow(
-                selectedTabIndex = tabs.indexOf(selectedTab),
+                selectedTabIndex = Tabs.values().indexOf(selectedTab),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                tabs.forEach { tab ->
+                Tabs.values().forEach { tab ->
                     Tab(
                         selected = tab == selectedTab,
                         onClick = { selectedTab = tab },
                         text = {
-                            Text(text = tab.name)
+                            Text(text = tab.title)
                         }
                     )
                 }
@@ -105,29 +119,28 @@ fun AutoScreen(
             AnimatedContent(targetState = targetState) { state ->
                 if (state == null) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter))
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.BottomCenter)
+                        )
                     }
                 } else {
                     val plots = selectedTab.getPlots(state)
                     Column {
-                        Plot(
-                            points = plots.averageUtilization,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                        )
-                        Plot(
-                            points = plots.averageTimeSpent,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                        )
-                        Plot(
-                            points = plots.denyProbability,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                        )
+                        Plots.values().forEach {
+                            Text(
+                                text = it.title,
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                            Plot(
+                                points = it.getPlot(plots),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f)
+                            )
+                        }
                     }
                 }
             }
@@ -147,11 +160,11 @@ fun Plot(points: List<Pair<Int, Double>>, modifier: Modifier = Modifier) {
         val height = maxHeight.value.toDouble() - margins.vMargins
         val width = maxWidth.value.toDouble() - margins.hMargins
         val xScale = Scales.Continuous.linear {
-            domain = listOf(.0, 100.0)
+            domain = listOf(.0, points.maxOf { it.first }.toDouble())
             range = listOf(0.0, width)
         }
         val yScale = Scales.Continuous.linear {
-            domain = listOf(0.0, 1.2)
+            domain = listOf(0.0, points.maxOf { it.second } * 1.2)
             range = listOf(height, 0.0)
         }
         val painter = rememberCollagePainter(
@@ -165,14 +178,14 @@ fun Plot(points: List<Pair<Int, Double>>, modifier: Modifier = Modifier) {
                 Axis(
                     orient = Orient.LEFT,
                     scale = yScale,
+                    tickStroke = MaterialTheme.colorScheme.onBackground.toArgb().col,
                     axisStroke = MaterialTheme.colorScheme.onBackground.toArgb().col,
-                    tickFormat = { "$it" },
                     fontColor = MaterialTheme.colorScheme.onBackground.toArgb().col
                 )
                 CollageElements(nodes = listOf(
                     path {
                         fill = null
-                        strokeColor = MaterialTheme.colorScheme.tertiary.toArgb().col
+                        strokeColor = MaterialTheme.colorScheme.secondary.toArgb().col
                         strokeWidth = 2.0
                         moveTo(
                             xScale(points.first().first.toDouble()),
@@ -193,9 +206,11 @@ fun Plot(points: List<Pair<Int, Double>>, modifier: Modifier = Modifier) {
             ) {
                 Axis(
                     orient = Orient.BOTTOM,
-                    axisStroke = MaterialTheme.colorScheme.onBackground.toArgb().col,
                     scale = xScale,
                     tickPadding = 16.0,
+                    tickFormat = { it.toInt().toString() },
+                    tickStroke = MaterialTheme.colorScheme.onBackground.toArgb().col,
+                    axisStroke = MaterialTheme.colorScheme.onBackground.toArgb().col,
                     fontColor = MaterialTheme.colorScheme.onBackground.toArgb().col
                 )
             }
