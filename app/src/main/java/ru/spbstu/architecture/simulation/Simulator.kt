@@ -1,5 +1,6 @@
 package ru.spbstu.architecture.simulation
 
+import kotlinx.serialization.Serializable
 import ru.spbstu.architecture.simulation.parts.Buffer
 import ru.spbstu.architecture.simulation.parts.Device
 import ru.spbstu.architecture.simulation.parts.Source
@@ -32,6 +33,7 @@ class Simulator(private val config: Config) {
                     deniedRequests.add(it)
                 }
             }
+
             is Event.RequestProcessed -> {
                 processedRequests.add(event.request)
             }
@@ -74,4 +76,25 @@ class Simulator(private val config: Config) {
             }
         )
     }
+
+    fun calculateAverageTimeSpent() = (processedRequests.map { it.processedAt - it.producedAt } +
+            deniedRequests.map { it.leftBufferAt - it.producedAt }).average()
+
+    fun calculateDenyProbability() = deniedRequests.size.toDouble() / emittedRequestCount
+
+    fun calculateAverageUtilization() = processedRequests
+        .groupBy { it.deviceIndex }
+        .map { (_, requests) ->
+            requests.sumOf { it.processedAt - it.leftBufferAt } / lastTime
+        }
+        .average()
+
+    @Serializable
+    data class Config(
+        val sourceCount: Int,
+        val deviceCount: Int,
+        val bufferSize: Int,
+        val sourceIntensity: Double,
+        val deviceProcessingTime: Pair<Double, Double>
+    )
 }

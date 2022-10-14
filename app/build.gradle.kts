@@ -56,6 +56,7 @@ android {
 
 dependencies {
     val composeVersion = "1.2.1"
+    val d2vVersion = "0.9.1"
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
     implementation("androidx.activity:activity-compose:1.6.0")
@@ -63,8 +64,17 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
     implementation("androidx.compose.material3:material3:1.0.0-rc01")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
-    implementation("io.github.raamcosta.compose-destinations:core:1.6.20-beta")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+    implementation("io.github.pt2121:collage:0.1.0-SNAPSHOT")
+    implementation("io.github.raamcosta.compose-destinations:core:1.6.20-beta")
+    implementation("io.data2viz.d2v:d2v-axis:$d2vVersion")
+    implementation("io.data2viz.d2v:d2v-chord:$d2vVersion")
+    implementation("io.data2viz.d2v:d2v-force:$d2vVersion")
+    implementation("io.data2viz.d2v:d2v-hexbin:$d2vVersion")
+    implementation("io.data2viz.d2v:d2v-random:$d2vVersion")
+    implementation("io.data2viz.d2v:d2v-scale:$d2vVersion")
+    implementation("io.data2viz.d2v:d2v-shape:$d2vVersion")
+    implementation("io.data2viz.d2v:d2v-viz:$d2vVersion")
     ksp("io.github.raamcosta.compose-destinations:ksp:1.6.20-beta")
     debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
     debugImplementation("androidx.compose.ui:ui-test-manifest:$composeVersion")
