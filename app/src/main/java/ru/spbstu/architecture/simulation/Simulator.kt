@@ -10,24 +10,26 @@ class Simulator(private val config: Config) {
     private val buffer = Buffer(config.bufferSize)
     private val deniedRequests = mutableListOf<Request.Denied>()
     private val processedRequests = mutableListOf<Request.Processed>()
-    private val stats = Stats()
+    private var emittedRequestCount = 0
 
-    fun step() {
+    fun step(maxRequests: Int): Boolean {
+        if (emittedRequestCount >= maxRequests) {
+            sources.forEach { it.pause() }
+        }
+
         val event = (sources.asSequence() + devices)
             .filter { it.nextEventTime != null }
             .minByOrNull { it.nextEventTime!! }
-            ?.onEvent() ?: TODO()
+            ?.onEvent() ?: return false
 
         when (event) {
             is Event.RequestEmitted -> {
-                stats.registerEmittedRequest(event.request)
+                emittedRequestCount += 1
                 buffer.put(event.request)?.let {
-                    stats.registerDeniedRequest(it)
                     deniedRequests.add(it)
                 }
             }
             is Event.RequestProcessed -> {
-                stats.registerProcessedRequest(event.request)
                 processedRequests.add(event.request)
             }
         }
@@ -38,6 +40,8 @@ class Simulator(private val config: Config) {
             val request = waitingRequest.beingProcessed(freeDevice.index, event.at)
             freeDevice.processRequest(request)
         }
+
+        return true
     }
 
     fun createEventCalendar(): EventCalendar {
@@ -46,8 +50,8 @@ class Simulator(private val config: Config) {
                 EventCalendar.SourceRow(
                     index = source.index,
                     time = source.nextEventTime,
-                    requestCount = stats.emittedRequestCountBySource[source.index] ?: 0,
-                    deniedRequestCount = stats.deniedRequestCountBySource[source.index] ?: 0
+                    requestCount = source.emittedCount,
+                    deniedRequestCount = source.deniedCount
                 )
             },
             devices = devices.map { device ->
@@ -55,7 +59,7 @@ class Simulator(private val config: Config) {
                     index = device.index,
                     time = device.nextEventTime,
                     isFree = device.isFree(),
-                    requestCount = stats.processedRequestCountByDevice[device.index] ?: 0
+                    requestCount = device.processedCount
                 )
             },
             buffer = buffer.array.mapIndexed { index, request ->

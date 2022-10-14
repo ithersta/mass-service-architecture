@@ -12,6 +12,8 @@ class Device(val index: Int, private val processingTime: Pair<Double, Double>) :
         private set
     override var nextEventTime: Double? = null
         private set
+    var processedCount = 0
+        private set
 
     fun isFree() = request == null
 
@@ -29,6 +31,7 @@ class Device(val index: Int, private val processingTime: Pair<Double, Double>) :
         return Event.RequestProcessed(request!!.processed(nextEventTime!!), nextEventTime!!).also {
             nextEventTime = null
             request = null
+            processedCount += 1
         }
     }
 }

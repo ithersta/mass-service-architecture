@@ -12,7 +12,7 @@ class StepByStepViewModel(config: Config) : ViewModel() {
     val state = _state.asStateFlow()
 
     fun step() {
-        simulator.step()
+        simulator.step(Int.MAX_VALUE)
         _state.value = simulator.createEventCalendar()
     }
 }

@@ -14,7 +14,8 @@ sealed interface Request {
 
     data class Waiting(
         override val sourceIndex: Int,
-        override val producedAt: Double
+        override val producedAt: Double,
+        val onDeny: () -> Unit
     ) : Request
 
     data class Denied(
@@ -40,7 +41,7 @@ sealed interface Request {
 }
 
 fun Request.Waiting.denied(at: Double) =
-    Request.Denied(sourceIndex, producedAt, at)
+    Request.Denied(sourceIndex, producedAt, at).also { onDeny() }
 
 fun Request.Waiting.beingProcessed(deviceIndex: Int, at: Double) =
     Request.BeingProcessed(sourceIndex, producedAt, at, deviceIndex)
