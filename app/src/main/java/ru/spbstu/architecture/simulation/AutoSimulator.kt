@@ -26,7 +26,8 @@ class AutoSimulator(private val config: Config) {
         val (averageUtilization, denyProbability, averageTimeSpent) = configs.map { (x, config) ->
             val simulator = Simulator(config)
             @Suppress("ControlFlowWithEmptyBody")
-            while (simulator.step(maxRequests)) { }
+            while (simulator.step(maxRequests)) {
+            }
             Triple(
                 x to simulator.calculateAverageUtilization(),
                 x to simulator.calculateDenyProbability(),
