@@ -126,20 +126,22 @@ fun AutoScreen(
                         )
                     }
                 } else {
-                    val plots = selectedTab.getPlots(state)
-                    Column {
-                        Plots.values().forEach {
-                            Text(
-                                text = it.title,
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                            Plot(
-                                points = it.getPlot(plots),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f)
-                            )
+                    AnimatedContent(targetState = selectedTab) { selectedTab ->
+                        val plots = selectedTab.getPlots(state)
+                        Column {
+                            Plots.values().forEach {
+                                Text(
+                                    text = it.title,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                                Plot(
+                                    points = it.getPlot(plots),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f)
+                                )
+                            }
                         }
                     }
                 }
