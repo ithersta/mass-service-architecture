@@ -105,8 +105,8 @@ private fun LazyListScope.sourcesTable(sources: List<EventCalendar.SourceRow>) {
                 ProvideTextStyle(value = MaterialTheme.typography.titleSmall) {
                     Text("№", modifier = Modifier.weight(indexWeight))
                     Text("Время", modifier = Modifier.weight(otherWeights))
-                    Text("Заявки", modifier = Modifier.weight(otherWeights))
-                    Text("Отказы", modifier = Modifier.weight(otherWeights))
+                    Text("Заявок", modifier = Modifier.weight(otherWeights))
+                    Text("Отказов", modifier = Modifier.weight(otherWeights))
                 }
             }
         }
@@ -138,7 +138,7 @@ private fun LazyListScope.devicesTable(sources: List<EventCalendar.DeviceRow>) {
                     Text("№", modifier = Modifier.weight(indexWeight))
                     Text("Время", modifier = Modifier.weight(otherWeights))
                     Text("Свободен", modifier = Modifier.weight(otherWeights))
-                    Text("Заявки", modifier = Modifier.weight(otherWeights))
+                    Text("Заявок обр.", modifier = Modifier.weight(otherWeights))
                 }
             }
         }
