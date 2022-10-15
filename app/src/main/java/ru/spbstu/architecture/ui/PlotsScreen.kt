@@ -38,49 +38,49 @@ import io.github.pt2121.collage.CollageElements
 import io.github.pt2121.collage.CollageGroup
 import io.github.pt2121.collage.d2v.path
 import io.github.pt2121.collage.rememberCollagePainter
-import ru.spbstu.architecture.simulation.AutoSimulator
+import ru.spbstu.architecture.simulation.Plotter
 
 enum class Tabs {
     Sources {
         override val title = "Источники"
-        override fun getPlots(result: AutoSimulator.Result) = result.varyingSourcePlots
+        override fun getPlots(result: Plotter.Result) = result.varyingSourcePlots
     },
     Devices {
         override val title = "Приборы"
-        override fun getPlots(result: AutoSimulator.Result) = result.varyingDevicePlots
+        override fun getPlots(result: Plotter.Result) = result.varyingDevicePlots
     },
     Buffer {
         override val title = "Буфер"
-        override fun getPlots(result: AutoSimulator.Result) = result.varyingBufferPlots
+        override fun getPlots(result: Plotter.Result) = result.varyingBufferPlots
     };
 
     abstract val title: String
-    abstract fun getPlots(result: AutoSimulator.Result): AutoSimulator.Result.Plots
+    abstract fun getPlots(result: Plotter.Result): Plotter.Result.Plots
 }
 
 enum class PlotType {
     AverageUtilization {
         override val title = "Средняя загруженность"
-        override fun getPlot(plots: AutoSimulator.Result.Plots) = plots.averageUtilization
+        override fun getPlot(plots: Plotter.Result.Plots) = plots.averageUtilization
     },
     AverageTimeSpent {
         override val title = "Среднее время в системе"
-        override fun getPlot(plots: AutoSimulator.Result.Plots) = plots.averageTimeSpent
+        override fun getPlot(plots: Plotter.Result.Plots) = plots.averageTimeSpent
     },
     DenyProbability {
         override val title = "Вероятность отказа"
-        override fun getPlot(plots: AutoSimulator.Result.Plots) = plots.denyProbability
+        override fun getPlot(plots: Plotter.Result.Plots) = plots.denyProbability
     };
 
     abstract val title: String
-    abstract fun getPlot(plots: AutoSimulator.Result.Plots): List<Pair<Int, Double>>
+    abstract fun getPlot(plots: Plotter.Result.Plots): List<Pair<Int, Double>>
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 @Destination
-fun AutoScreen(
-    viewModel: AutoViewModel = viewModel()
+fun PlotsScreen(
+    viewModel: PlotsViewModel = viewModel()
 ) {
     Scaffold(
         topBar = {

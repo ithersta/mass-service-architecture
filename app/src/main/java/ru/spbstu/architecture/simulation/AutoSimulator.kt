@@ -6,41 +6,8 @@ import kotlin.math.ceil
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-class AutoSimulator(private val config: Config) {
-    fun work(): Result {
-        val defaultConfig = Simulator.Config(
-            sourceCount = config.defaultSourceCount,
-            deviceCount = config.defaultDeviceCount,
-            bufferSize = config.defaultBufferSize,
-            sourceIntensity = config.sourceIntensity,
-            deviceProcessingTime = config.deviceProcessingTime
-        )
-        return Result(
-            varyingSourcePlots = createPlots(config.sourceCountRange.asSequence()
-                .map { it to defaultConfig.copy(sourceCount = it) }),
-            varyingDevicePlots = createPlots(config.deviceCountRange.asSequence()
-                .map { it to defaultConfig.copy(deviceCount = it) }),
-            varyingBufferPlots = createPlots(config.bufferSizeRange.asSequence()
-                .map { it to defaultConfig.copy(bufferSize = it) })
-        )
-    }
-
-    private fun createPlots(
-        configs: Sequence<Pair<Int, Simulator.Config>>
-    ): Result.Plots {
-        val (averageUtilization, denyProbability, averageTimeSpent) = configs.map { (x, config) ->
-            val simulator = simulateWithPrecision(config)
-            Triple(
-                x to simulator.calculateAverageUtilization(),
-                x to simulator.calculateDenyProbability(),
-                x to simulator.calculateAverageTimeSpent()
-            )
-        }.asIterable().unzip()
-        return Result.Plots(averageUtilization, denyProbability, averageTimeSpent)
-    }
-
-    private fun simulateWithPrecision(
-        config: Simulator.Config,
+class AutoSimulator(private val config: Simulator.Config) {
+    fun withPrecision(
         tAlpha: Double = 1.643,
         delta: Double = 0.1,
         initialMaxRequests: Int = 100
@@ -62,27 +29,4 @@ class AutoSimulator(private val config: Config) {
             denyProbability = p
         }
     }
-
-    data class Result(
-        val varyingSourcePlots: Plots,
-        val varyingDevicePlots: Plots,
-        val varyingBufferPlots: Plots
-    ) {
-        data class Plots(
-            val averageUtilization: List<Pair<Int, Double>>,
-            val denyProbability: List<Pair<Int, Double>>,
-            val averageTimeSpent: List<Pair<Int, Double>>
-        )
-    }
-
-    data class Config(
-        val defaultSourceCount: Int,
-        val defaultDeviceCount: Int,
-        val defaultBufferSize: Int,
-        val sourceIntensity: Double,
-        val deviceProcessingTime: Pair<Double, Double>,
-        val sourceCountRange: IntRange,
-        val deviceCountRange: IntRange,
-        val bufferSizeRange: IntRange
-    )
 }

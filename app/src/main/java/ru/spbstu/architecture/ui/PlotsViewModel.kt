@@ -6,11 +6,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ru.spbstu.architecture.simulation.AutoSimulator
+import ru.spbstu.architecture.simulation.Plotter
 
-class AutoViewModel : ViewModel() {
-    private val autoSimulator = AutoSimulator(
-        AutoSimulator.Config(
+class PlotsViewModel : ViewModel() {
+    private val plotter = Plotter(
+        Plotter.Config(
             defaultSourceCount = 64,
             defaultDeviceCount = 12,
             defaultBufferSize = 8,
@@ -22,12 +22,12 @@ class AutoViewModel : ViewModel() {
         )
     )
 
-    private val _state = MutableStateFlow<AutoSimulator.Result?>(null)
+    private val _state = MutableStateFlow<Plotter.Result?>(null)
     val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            _state.value = autoSimulator.work()
+            _state.value = plotter.simulate()
         }
     }
 }

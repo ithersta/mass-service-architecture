@@ -24,7 +24,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import ru.spbstu.architecture.simulation.Simulator
-import ru.spbstu.architecture.ui.destinations.AutoScreenDestination
+import ru.spbstu.architecture.ui.destinations.PlotsScreenDestination
 import ru.spbstu.architecture.ui.destinations.StepByStepScreenDestination
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -108,7 +108,7 @@ fun MainScreen(navigator: DestinationsNavigator) {
                     Text("Пошаговая симуляция")
                 }
             }
-            Button(onClick = { navigator.navigate(AutoScreenDestination()) }) {
+            Button(onClick = { navigator.navigate(PlotsScreenDestination()) }) {
                 Text("Автоматическая симуляция")
             }
         }
