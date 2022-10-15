@@ -89,7 +89,7 @@ fun AutoScreen(
             )
         }
     ) { padding ->
-        val targetState by viewModel.state.collectAsState(initial = null)
+        val targetState by viewModel.state.collectAsState()
         Column(
             modifier = Modifier
                 .fillMaxSize()

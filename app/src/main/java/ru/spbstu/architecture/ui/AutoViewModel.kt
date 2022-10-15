@@ -27,7 +27,7 @@ class AutoViewModel : ViewModel() {
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            _state.value = autoSimulator.work(500)
+            _state.value = autoSimulator.work()
         }
     }
 }
