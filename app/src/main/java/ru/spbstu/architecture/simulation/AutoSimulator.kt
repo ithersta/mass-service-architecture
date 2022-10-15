@@ -53,7 +53,8 @@ class AutoSimulator(private val config: Config) {
             while (simulator.step(maxRequests)) {
             }
             val p = simulator.calculateDenyProbability()
-            maxRequests = ceil(tAlpha.pow(2) * (1 - p) / (p * delta.pow(2))).roundToInt().coerceAtMost(1000)
+            maxRequests = ceil(tAlpha.pow(2) * (1 - p) / (p * delta.pow(2))).roundToInt()
+                .coerceAtMost(1000)
             if (abs(p - denyProbability) / denyProbability < delta || denyProbability < 0.001) {
                 Log.d("SIMULATOR", maxRequests.toString())
                 return simulator
