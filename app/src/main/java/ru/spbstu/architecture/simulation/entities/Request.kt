@@ -1,4 +1,4 @@
-package ru.spbstu.architecture.simulation
+package ru.spbstu.architecture.simulation.entities
 
 sealed interface Request {
     val sourceIndex: Int

@@ -1,7 +1,5 @@
-package ru.spbstu.architecture.simulation.parts
+package ru.spbstu.architecture.simulation.entities
 
-import ru.spbstu.architecture.simulation.Event
-import ru.spbstu.architecture.simulation.Request
 import ru.spbstu.architecture.simulation.poissonSequence
 import kotlin.random.Random
 

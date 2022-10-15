@@ -1,7 +1,4 @@
-package ru.spbstu.architecture.simulation.parts
-
-import ru.spbstu.architecture.simulation.Request
-import ru.spbstu.architecture.simulation.denied
+package ru.spbstu.architecture.simulation.entities
 
 class Buffer(size: Int) {
     private var index = 0

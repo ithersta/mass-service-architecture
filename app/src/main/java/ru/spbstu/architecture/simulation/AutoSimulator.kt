@@ -10,20 +10,21 @@ class AutoSimulator(private val config: Simulator.Config) {
     fun withPrecision(
         tAlpha: Double = 1.643,
         delta: Double = 0.1,
-        initialMaxRequests: Int = 100
+        initialRequestCount: Int = 100,
+        maxRequestCount: Int = 1000
     ): Simulator {
-        var maxRequests = initialMaxRequests
+        var requestCount = initialRequestCount
         var denyProbability = Double.NaN
         while (true) {
             val simulator = Simulator(config)
             @Suppress("ControlFlowWithEmptyBody")
-            while (simulator.step(maxRequests)) {
+            while (simulator.step(requestCount)) {
             }
             val p = simulator.calculateDenyProbability()
-            maxRequests = ceil(tAlpha.pow(2) * (1 - p) / (p * delta.pow(2))).roundToInt()
-                .coerceAtMost(1000)
+            requestCount = ceil(tAlpha.pow(2) * (1 - p) / (p * delta.pow(2))).roundToInt()
+                .coerceAtMost(maxRequestCount)
             if (abs(p - denyProbability) / denyProbability < delta || denyProbability < 0.001) {
-                Log.d("SIMULATOR", maxRequests.toString())
+                Log.d("SIMULATOR", requestCount.toString())
                 return simulator
             }
             denyProbability = p

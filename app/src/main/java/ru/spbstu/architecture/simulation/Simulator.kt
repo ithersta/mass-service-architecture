@@ -1,9 +1,13 @@
 package ru.spbstu.architecture.simulation
 
 import kotlinx.serialization.Serializable
-import ru.spbstu.architecture.simulation.parts.Buffer
-import ru.spbstu.architecture.simulation.parts.Device
-import ru.spbstu.architecture.simulation.parts.Source
+import ru.spbstu.architecture.simulation.entities.Buffer
+import ru.spbstu.architecture.simulation.entities.Device
+import ru.spbstu.architecture.simulation.entities.Event
+import ru.spbstu.architecture.simulation.entities.Request
+import ru.spbstu.architecture.simulation.entities.Source
+import ru.spbstu.architecture.simulation.entities.beingProcessed
+import ru.spbstu.architecture.simulation.math.variance
 
 class Simulator(private val config: Config) {
     private val seed = config.hashCode()
@@ -47,6 +51,48 @@ class Simulator(private val config: Config) {
         }
 
         return true
+    }
+
+    fun createTable(): Table {
+        val averageWaitingTimeBySource = (deniedRequests.asSequence() + processedRequests)
+            .groupBy { it.sourceIndex }
+            .mapValues { (_, value) ->
+                value.map { it.leftBufferAt - it.producedAt }
+            }
+            .mapValues { it.value.average() to it.value.variance() }
+        val averageProcessingTimeBySource = processedRequests
+            .groupBy { it.sourceIndex }
+            .mapValues { (_, value) ->
+                value.map { it.processedAt - it.leftBufferAt }
+            }
+            .mapValues { it.value.average() to it.value.variance() }
+        val utilizationByDevice = processedRequests
+            .groupBy { it.deviceIndex }
+            .mapValues { (_, requests) ->
+                requests.sumOf { it.processedAt - it.leftBufferAt } / lastTime
+            }
+        return Table(
+            sources = sources.map { source ->
+                val averageWaitingTime = averageWaitingTimeBySource[source.index] ?: (0.0 to 0.0)
+                val averageProcessingTime = averageProcessingTimeBySource[source.index] ?: (0.0 to 0.0)
+                Table.SourceRow(
+                    index = source.index,
+                    requestCount = source.emittedCount,
+                    denyProbability = source.deniedCount.toDouble() / source.emittedCount,
+                    averageTimeSpent = averageProcessingTime.first + averageWaitingTime.first,
+                    averageWaitingTime = averageWaitingTime.first,
+                    averageProcessingTime = averageProcessingTime.first,
+                    waitingTimeVariance = averageWaitingTime.second,
+                    processingTimeVariance = averageProcessingTime.second
+                )
+            },
+            devices = devices.map { device ->
+                Table.DeviceRow(
+                    index = device.index,
+                    utilization = utilizationByDevice[device.index] ?: 0.0
+                )
+            }
+        )
     }
 
     fun createEventCalendar(): EventCalendar {
