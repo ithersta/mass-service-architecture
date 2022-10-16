@@ -75,10 +75,10 @@ class Simulator(private val config: Config) {
                     index = source.index,
                     requestCount = source.emittedCount,
                     denyProbability = source.deniedCount.toDouble() / source.emittedCount,
-                    averageWaitingTime = waitingTimes[source.index]?.average() ?: 0.0,
-                    averageProcessingTime = processingTimes[source.index]?.average() ?: 0.0,
-                    waitingTimeVariance = waitingTimes[source.index]?.variance() ?: 0.0,
-                    processingTimeVariance = processingTimes[source.index]?.variance() ?: 0.0
+                    averageWaitingTime = waitingTimes[source.index]?.average(),
+                    averageProcessingTime = processingTimes[source.index]?.average(),
+                    waitingTimeVariance = waitingTimes[source.index]?.variance(),
+                    processingTimeVariance = processingTimes[source.index]?.variance()
                 )
             },
             devices = devices.map { device ->

@@ -8,12 +8,12 @@ data class Table(
         val index: Int,
         val requestCount: Int,
         val denyProbability: Double,
-        val averageWaitingTime: Double,
-        val averageProcessingTime: Double,
-        val waitingTimeVariance: Double,
-        val processingTimeVariance: Double
+        val averageWaitingTime: Double?,
+        val averageProcessingTime: Double?,
+        val waitingTimeVariance: Double?,
+        val processingTimeVariance: Double?
     ) {
-        val averageTimeSpent get() = averageProcessingTime + averageWaitingTime
+        val averageTimeSpent get() = averageWaitingTime?.plus(averageProcessingTime ?: 0.0)
     }
 
     data class DeviceRow(

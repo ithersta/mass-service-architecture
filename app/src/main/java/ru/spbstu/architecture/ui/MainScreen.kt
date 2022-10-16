@@ -1,5 +1,13 @@
 package ru.spbstu.architecture.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.with
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -34,15 +42,14 @@ import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import ru.spbstu.architecture.simulation.Plotter
 import ru.spbstu.architecture.simulation.Simulator
-import ru.spbstu.architecture.ui.destinations.PlotsScreenDestination
-import ru.spbstu.architecture.ui.destinations.StepByStepScreenDestination
+import ru.spbstu.architecture.ui.destinations.*
 import ru.spbstu.architecture.ui.utils.toDoubleRangeOrNull
 import ru.spbstu.architecture.ui.utils.toIntRangeOrNull
 import ru.spbstu.architecture.ui.utils.toPair
 
 enum class Mode { StepByStep, Auto }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @RootNavGraph(start = true)
 @Destination
 @Composable
@@ -56,12 +63,10 @@ fun MainScreen(navigator: DestinationsNavigator) {
     ) { padding ->
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
-            horizontalAlignment = Alignment.Start,
             modifier = Modifier
                 .padding(padding)
                 .padding(horizontal = 16.dp)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
         ) {
             var selectedMode by rememberSaveable { mutableStateOf(Mode.StepByStep) }
             Row {
@@ -77,20 +82,30 @@ fun MainScreen(navigator: DestinationsNavigator) {
                     label = { Text(text = "Автоматический") }
                 )
             }
-            when (selectedMode) {
-                Mode.StepByStep -> StepByStepConfig(
-                    onStart = { navigator.navigate(StepByStepScreenDestination(it)) }
-                )
+            AnimatedContent(targetState = selectedMode) { mode ->
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    when (mode) {
+                        Mode.StepByStep -> StepByStepConfig(
+                            onStart = { navigator.navigate(StepByStepScreenDestination(it)) }
+                        )
 
-                Mode.Auto -> StepByStepConfig(
-                    onStart = { },
-                    addition = { simulatorConfig ->
-                        PlotterConfig(
-                            config = simulatorConfig,
-                            onStart = { navigator.navigate(PlotsScreenDestination(it)) }
+                        Mode.Auto -> StepByStepConfig(
+                            onStart = { navigator.navigate(AutoScreenDestination(it)) },
+                            addition = { simulatorConfig ->
+                                PlotterConfig(
+                                    config = simulatorConfig,
+                                    onStart = { navigator.navigate(PlotsScreenDestination(it)) }
+                                )
+                            }
                         )
                     }
-                )
+                }
             }
         }
     }

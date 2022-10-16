@@ -7,11 +7,11 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 
 class AutoSimulator(private val config: Simulator.Config) {
-    fun withPrecision(
+    fun simulateWithPrecision(
         tAlpha: Double = 1.643,
         delta: Double = 0.1,
-        initialRequestCount: Int = 100,
-        maxRequestCount: Int = 500
+        initialRequestCount: Int = 200,
+        maxRequestCount: Int = 1500
     ): Simulator {
         var requestCount = initialRequestCount
         var denyProbability = Double.NaN
