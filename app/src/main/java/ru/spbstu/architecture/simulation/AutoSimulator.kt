@@ -11,7 +11,7 @@ class AutoSimulator(private val config: Simulator.Config) {
         tAlpha: Double = 1.643,
         delta: Double = 0.1,
         initialRequestCount: Int = 100,
-        maxRequestCount: Int = 5000
+        maxRequestCount: Int = 2000
     ): Simulator {
         var requestCount = initialRequestCount
         var denyProbability = Double.NaN
