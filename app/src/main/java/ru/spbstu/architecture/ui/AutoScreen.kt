@@ -43,7 +43,7 @@ fun AutoScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Сводная таблица") }
+                title = { Text("Автоматическая симуляция") }
             )
         }
     ) { padding ->

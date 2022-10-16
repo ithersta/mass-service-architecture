@@ -87,7 +87,7 @@ fun PlotsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Автоматическая симуляция") }
+                title = { Text("Графики") }
             )
         }
     ) { padding ->

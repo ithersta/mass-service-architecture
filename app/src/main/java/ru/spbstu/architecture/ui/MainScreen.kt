@@ -188,7 +188,7 @@ private fun ColumnScope.StepByStepConfig(
             onClick = { onStart(it) },
             modifier = Modifier.align(Alignment.End)
         ) {
-            Text("Начать")
+            Text("Симулировать")
         }
     } ?: run {
         Button(
@@ -249,7 +249,7 @@ private fun ColumnScope.PlotterConfig(
             onClick = { onStart(it) },
             modifier = Modifier.align(Alignment.End)
         ) {
-            Text("Построить")
+            Text("Построить графики")
         }
     } ?: run {
         Button(
