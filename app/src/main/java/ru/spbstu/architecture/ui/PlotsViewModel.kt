@@ -8,24 +8,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.spbstu.architecture.simulation.Plotter
 
-class PlotsViewModel : ViewModel() {
-    private val plotter = Plotter(
-        Plotter.Config(
-            defaultSourceCount = 64,
-            defaultDeviceCount = 12,
-            defaultBufferSize = 8,
-            sourceIntensity = 0.5,
-            deviceProcessingTime = 0.1 to 1.0,
-            sourceCountRange = 1..100,
-            deviceCountRange = 1..100,
-            bufferSizeRange = 1..100
-        )
-    )
-
+class PlotsViewModel(config: Plotter.Config) : ViewModel() {
     private val _state = MutableStateFlow<Plotter.Result?>(null)
     val state = _state.asStateFlow()
 
     init {
+        val plotter = Plotter(config)
         viewModelScope.launch(Dispatchers.Default) {
             _state.value = plotter.simulate()
         }

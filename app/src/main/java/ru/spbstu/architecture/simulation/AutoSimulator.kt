@@ -11,7 +11,7 @@ class AutoSimulator(private val config: Simulator.Config) {
         tAlpha: Double = 1.643,
         delta: Double = 0.1,
         initialRequestCount: Int = 100,
-        maxRequestCount: Int = 1000
+        maxRequestCount: Int = 500
     ): Simulator {
         var requestCount = initialRequestCount
         var denyProbability = Double.NaN
@@ -21,13 +21,13 @@ class AutoSimulator(private val config: Simulator.Config) {
             while (simulator.step(requestCount)) {
             }
             val p = simulator.calculateDenyProbability()
-            requestCount = ceil(tAlpha.pow(2) * (1 - p) / (p * delta.pow(2))).roundToInt()
-                .coerceAtMost(maxRequestCount)
-            if (abs(p - denyProbability) / denyProbability < delta || denyProbability < 0.001) {
+            if (abs(p - denyProbability) / denyProbability < delta || denyProbability < 0.01) {
                 Log.d("SIMULATOR", requestCount.toString())
                 return simulator
             }
             denyProbability = p
+            requestCount = ceil(tAlpha.pow(2) * (1 - p) / (p * delta.pow(2))).roundToInt()
+                .coerceIn(requestCount, maxRequestCount)
         }
     }
 }

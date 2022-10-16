@@ -39,6 +39,7 @@ import io.github.pt2121.collage.CollageGroup
 import io.github.pt2121.collage.d2v.path
 import io.github.pt2121.collage.rememberCollagePainter
 import ru.spbstu.architecture.simulation.Plotter
+import ru.spbstu.architecture.simulation.Simulator
 
 enum class Tabs {
     Sources {
@@ -80,7 +81,8 @@ enum class PlotType {
 @Composable
 @Destination
 fun PlotsScreen(
-    viewModel: PlotsViewModel = viewModel()
+    config: Plotter.Config,
+    viewModel: PlotsViewModel = viewModel { PlotsViewModel(config) }
 ) {
     Scaffold(
         topBar = {
@@ -117,7 +119,8 @@ fun PlotsScreen(
                         LinearProgressIndicator(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .align(Alignment.BottomCenter)
+                                .align(Alignment.Center)
+                                .padding(32.dp)
                         )
                     }
                 } else {

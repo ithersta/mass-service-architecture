@@ -1,21 +1,17 @@
 package ru.spbstu.architecture.simulation
 
+import kotlinx.serialization.Serializable
+import ru.spbstu.architecture.ui.utils.IntRangeSerializer
+
 class Plotter(private val config: Config) {
     fun simulate(): Result {
-        val defaultConfig = Simulator.Config(
-            sourceCount = config.defaultSourceCount,
-            deviceCount = config.defaultDeviceCount,
-            bufferSize = config.defaultBufferSize,
-            sourceIntensity = config.sourceIntensity,
-            deviceProcessingTime = config.deviceProcessingTime
-        )
         return Result(
             varyingSourcePlots = createPlots(config.sourceCountRange.asSequence()
-                .map { it to defaultConfig.copy(sourceCount = it) }),
+                .map { it to config.defaultSimulatorConfig.copy(sourceCount = it) }),
             varyingDevicePlots = createPlots(config.deviceCountRange.asSequence()
-                .map { it to defaultConfig.copy(deviceCount = it) }),
+                .map { it to config.defaultSimulatorConfig.copy(deviceCount = it) }),
             varyingBufferPlots = createPlots(config.bufferSizeRange.asSequence()
-                .map { it to defaultConfig.copy(bufferSize = it) })
+                .map { it to config.defaultSimulatorConfig.copy(bufferSize = it) })
         )
     }
 
@@ -45,14 +41,11 @@ class Plotter(private val config: Config) {
         )
     }
 
+    @Serializable
     data class Config(
-        val defaultSourceCount: Int,
-        val defaultDeviceCount: Int,
-        val defaultBufferSize: Int,
-        val sourceIntensity: Double,
-        val deviceProcessingTime: Pair<Double, Double>,
-        val sourceCountRange: IntRange,
-        val deviceCountRange: IntRange,
-        val bufferSizeRange: IntRange
+        val defaultSimulatorConfig: Simulator.Config,
+        @Serializable(with = IntRangeSerializer::class) val sourceCountRange: IntRange,
+        @Serializable(with = IntRangeSerializer::class) val deviceCountRange: IntRange,
+        @Serializable(with = IntRangeSerializer::class) val bufferSizeRange: IntRange
     )
 }
