@@ -10,8 +10,8 @@ class AutoSimulator(private val config: Simulator.Config) {
     fun simulateWithPrecision(
         tAlpha: Double = 1.643,
         delta: Double = 0.1,
-        initialRequestCount: Int = 200,
-        maxRequestCount: Int = 1500
+        initialRequestCount: Int = 100,
+        maxRequestCount: Int = 5000
     ): Simulator {
         var requestCount = initialRequestCount
         var denyProbability = Double.NaN
@@ -21,7 +21,7 @@ class AutoSimulator(private val config: Simulator.Config) {
             while (simulator.step(requestCount)) {
             }
             val p = simulator.calculateDenyProbability()
-            if (abs(p - denyProbability) / denyProbability < delta || denyProbability < 0.01) {
+            if (abs(p - denyProbability) / denyProbability < delta || denyProbability < 0.001) {
                 Log.d("SIMULATOR", requestCount.toString())
                 return simulator
             }
