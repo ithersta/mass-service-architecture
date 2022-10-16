@@ -54,18 +54,16 @@ class Simulator(private val config: Config) {
     }
 
     fun createTable(): Table {
-        val averageWaitingTimeBySource = (deniedRequests.asSequence() + processedRequests)
+        val waitingTimes = (deniedRequests.asSequence() + processedRequests)
             .groupBy { it.sourceIndex }
             .mapValues { (_, value) ->
                 value.map { it.leftBufferAt - it.producedAt }
             }
-            .mapValues { it.value.average() to it.value.variance() }
-        val averageProcessingTimeBySource = processedRequests
+        val processingTimes = processedRequests
             .groupBy { it.sourceIndex }
             .mapValues { (_, value) ->
                 value.map { it.processedAt - it.leftBufferAt }
             }
-            .mapValues { it.value.average() to it.value.variance() }
         val utilizationByDevice = processedRequests
             .groupBy { it.deviceIndex }
             .mapValues { (_, requests) ->
@@ -73,17 +71,14 @@ class Simulator(private val config: Config) {
             }
         return Table(
             sources = sources.map { source ->
-                val averageWaitingTime = averageWaitingTimeBySource[source.index] ?: (0.0 to 0.0)
-                val averageProcessingTime = averageProcessingTimeBySource[source.index] ?: (0.0 to 0.0)
                 Table.SourceRow(
                     index = source.index,
                     requestCount = source.emittedCount,
                     denyProbability = source.deniedCount.toDouble() / source.emittedCount,
-                    averageTimeSpent = averageProcessingTime.first + averageWaitingTime.first,
-                    averageWaitingTime = averageWaitingTime.first,
-                    averageProcessingTime = averageProcessingTime.first,
-                    waitingTimeVariance = averageWaitingTime.second,
-                    processingTimeVariance = averageProcessingTime.second
+                    averageWaitingTime = waitingTimes[source.index]?.average() ?: 0.0,
+                    averageProcessingTime = processingTimes[source.index]?.average() ?: 0.0,
+                    waitingTimeVariance = waitingTimes[source.index]?.variance() ?: 0.0,
+                    processingTimeVariance = processingTimes[source.index]?.variance() ?: 0.0
                 )
             },
             devices = devices.map { device ->
