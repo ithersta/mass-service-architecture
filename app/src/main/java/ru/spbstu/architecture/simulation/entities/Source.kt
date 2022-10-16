@@ -29,8 +29,4 @@ class Source(
             emittedCount += 1
         }
     }
-
-    fun pause() {
-        nextEvent = null
-    }
 }

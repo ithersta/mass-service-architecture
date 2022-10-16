@@ -20,12 +20,10 @@ class Simulator(private val config: Config) {
     private var lastTime: Double = 0.0
 
     fun step(maxRequests: Int): Boolean {
-        if (emittedRequestCount >= maxRequests) {
-            sources.forEach { it.pause() }
-        }
-
-        val event = (sources.asSequence() + devices)
-            .filter { it.nextEventTime != null }
+        val event = sequence {
+            if (emittedRequestCount < maxRequests) yieldAll(sources)
+            yieldAll(devices)
+        }.filter { it.nextEventTime != null }
             .minByOrNull { it.nextEventTime!! }
             ?.onEvent() ?: return false
         lastTime = event.at
