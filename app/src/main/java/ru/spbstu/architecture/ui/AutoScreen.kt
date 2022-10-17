@@ -67,7 +67,7 @@ fun AutoScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 private fun LazyListScope.sourcesTable(sources: List<Table.SourceRow>) {
     stickyHeader {
         Column(
@@ -105,7 +105,7 @@ private fun LazyListScope.sourcesTable(sources: List<Table.SourceRow>) {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 private fun LazyListScope.devicesTable(sources: List<Table.DeviceRow>) {
     stickyHeader {
         Column(
