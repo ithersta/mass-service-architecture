@@ -9,8 +9,8 @@ import ru.spbstu.architecture.simulation.entities.Source
 import ru.spbstu.architecture.simulation.entities.beingProcessed
 import ru.spbstu.architecture.simulation.math.variance
 
-class Simulator(private val config: Config) {
-    private val seed = config.hashCode()
+class Simulator(private val config: Config, private val maxRequests: Int) {
+    private val seed = config.hashCode().xor(maxRequests)
     private val sources = List(config.sourceCount) { Source(it, config.sourceIntensity, seed) }
     private val devices = List(config.deviceCount) { Device(it, config.deviceProcessingTime, seed) }
     private val buffer = Buffer(config.bufferSize)
@@ -19,7 +19,7 @@ class Simulator(private val config: Config) {
     private var emittedRequestCount = 0
     private var lastTime: Double = 0.0
 
-    fun step(maxRequests: Int): Boolean {
+    fun step(): Boolean {
         val event = sequence {
             if (emittedRequestCount < maxRequests) yieldAll(sources)
             yieldAll(devices)

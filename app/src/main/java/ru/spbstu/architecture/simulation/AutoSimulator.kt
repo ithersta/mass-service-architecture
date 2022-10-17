@@ -16,18 +16,21 @@ class AutoSimulator(private val config: Simulator.Config) {
         var requestCount = initialRequestCount
         var denyProbability = Double.NaN
         while (true) {
-            val simulator = Simulator(config)
+            val simulator = Simulator(config, requestCount)
             @Suppress("ControlFlowWithEmptyBody")
-            while (simulator.step(requestCount)) {
+            while (simulator.step()) {
             }
             val p = simulator.calculateDenyProbability()
-            if (abs(p - denyProbability) / denyProbability < delta || denyProbability < 0.001) {
+            if (
+                abs(p - denyProbability) / denyProbability < delta ||
+                requestCount >= maxRequestCount
+            ) {
                 Log.d("SIMULATOR", requestCount.toString())
                 return simulator
             }
             denyProbability = p
             requestCount = ceil(tAlpha.pow(2) * (1 - p) / (p * delta.pow(2))).roundToInt()
-                .coerceIn(requestCount, maxRequestCount)
+                .coerceIn(requestCount + 1, maxRequestCount)
         }
     }
 }
