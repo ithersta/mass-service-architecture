@@ -113,7 +113,7 @@ private fun LazyListScope.devicesTable(sources: List<Table.DeviceRow>) {
                 .background(MaterialTheme.colorScheme.background)
                 .padding(bottom = 8.dp)
         ) {
-            Text(text = "Источники", style = MaterialTheme.typography.titleLarge)
+            Text(text = "Приборы", style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.size(8.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
                 ProvideTextStyle(value = MaterialTheme.typography.titleSmall) {

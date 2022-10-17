@@ -13,9 +13,8 @@ class PlotsViewModel(config: Plotter.Config) : ViewModel() {
     val state = _state.asStateFlow()
 
     init {
-        val plotter = Plotter(config)
         viewModelScope.launch(Dispatchers.Default) {
-            _state.value = plotter.simulate()
+            _state.value = Plotter(config).simulate()
         }
     }
 }

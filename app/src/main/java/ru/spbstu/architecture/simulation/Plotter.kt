@@ -19,12 +19,13 @@ class Plotter(private val config: Config) {
         configs: Sequence<Pair<Int, Simulator.Config>>
     ): Result.Plots {
         val (averageUtilization, denyProbability, averageTimeSpent) = configs.map { (x, config) ->
-            val simulator = AutoSimulator(config).simulateWithPrecision()
-            Triple(
-                x to simulator.calculateAverageUtilization(),
-                x to simulator.calculateDenyProbability(),
-                x to simulator.calculateAverageTimeSpent()
-            )
+            AutoSimulator(config).simulate().run {
+                Triple(
+                    x to calculateAverageUtilization(),
+                    x to calculateDenyProbability(),
+                    x to calculateAverageTimeSpent()
+                )
+            }
         }.asIterable().unzip()
         return Result.Plots(averageUtilization, denyProbability, averageTimeSpent)
     }

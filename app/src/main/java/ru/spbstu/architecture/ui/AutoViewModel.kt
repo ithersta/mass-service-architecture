@@ -17,7 +17,7 @@ class AutoViewModel(config: Simulator.Config) : ViewModel() {
     init {
         viewModelScope.launch(Dispatchers.Default) {
             _state.value = AutoSimulator(config)
-                .simulateWithPrecision(initialRequestCount = 100, maxRequestCount = 10000)
+                .simulateWithPrecision(initialRequestCount = 10000, maxRequestCount = 10000)
                 .createTable()
         }
     }

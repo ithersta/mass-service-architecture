@@ -121,9 +121,11 @@ class Simulator(private val config: Config, private val maxRequests: Int) {
 
     fun calculateDenyProbability() = deniedRequests.size.toDouble() / emittedRequestCount
 
-    fun calculateAverageUtilization() = processedRequests
-        .groupBy { it.deviceIndex }
-        .map { (_, requests) ->
+    fun calculateAverageUtilization() = devices
+        .map { device ->
+            processedRequests.filter { it.deviceIndex == device.index }
+        }
+        .map { requests ->
             requests.sumOf { it.processedAt - it.leftBufferAt } / lastTime
         }
         .average()
