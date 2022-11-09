@@ -1,6 +1,5 @@
 package ru.spbstu.architecture.simulation
 
-import android.util.Log
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.pow
@@ -22,7 +21,6 @@ class AutoSimulator(private val config: Simulator.Config) {
                 abs(p - denyProbability) / denyProbability < delta ||
                 requestCount >= maxRequestCount
             ) {
-                Log.d("SIMULATOR", requestCount.toString())
                 return simulator
             }
             denyProbability = p
