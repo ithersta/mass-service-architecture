@@ -5,5 +5,5 @@ import java.io.File
 
 fun main() {
     val csv = Bruteforcer().generateCsv()
-    File("results.csv").writeText(csv)
+    File("results2.csv").writeText(csv)
 }

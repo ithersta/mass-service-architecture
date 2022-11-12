@@ -1,6 +1,8 @@
 package ru.spbstu.architecture.simulation
 
-import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 
 class Bruteforcer {
     class DeviceType(
@@ -19,40 +21,45 @@ class Bruteforcer {
         val averageTimeSpent: Double
     )
 
-    fun generateCsv(): String {
-        val rows = mutableListOf<Row>()
+    fun generateCsv(): String = runBlocking {
         val bufferPrice = 2_000
-        for (deviceCount in 1..20) {
-            for (bufferSize in 1..20) {
-                for (deviceType in listOf(
-                    DeviceType("1", 0.5 to 0.75, 90_000),
-                    DeviceType("2", 0.75 to 1.0, 50_000),
-                    DeviceType("3", 1.0 to 1.25, 30_000)
-                )) {
-                    println(rows.size.toString())
-                    val config = Simulator.Config(
-                        sourceCount = 768,
-                        deviceCount = deviceCount,
-                        bufferSize = bufferSize,
-                        sourceIntensity = 0.003,
-                        deviceProcessingTime = deviceType.processingTime
-                    )
-                    val simulator = AutoSimulator(config).simulate(10_000)
-                    rows.add(Row(
-                        deviceTypeName = deviceType.name,
-                        deviceCount = deviceCount,
-                        bufferSize = bufferSize,
-                        price = bufferPrice * bufferSize + deviceType.price * deviceCount,
-                        denyProbability = simulator.calculateDenyProbability(),
-                        averageUtilization = simulator.calculateAverageUtilization(),
-                        averageTimeSpent = simulator.calculateAverageTimeSpent()
-                    ))
+        val rows = buildList {
+            for (deviceCount in 1..20) {
+                for (bufferSize in 1..20) {
+                    for (deviceType in listOf(
+                        DeviceType("1", 0.5 to 0.75, 60_000),
+                        DeviceType("2", 0.75 to 1.0, 50_000),
+                        DeviceType("3", 1.0 to 1.25, 40_000)
+                    )) {
+                        add(async(Dispatchers.Default) {
+                            val config = Simulator.Config(
+                                sourceCount = 768,
+                                deviceCount = deviceCount,
+                                bufferSize = bufferSize,
+                                sourceIntensity = 0.003,
+                                deviceProcessingTime = deviceType.processingTime
+                            )
+                            val simulator = AutoSimulator(config).simulate(100_000)
+                            Row(
+                                deviceTypeName = deviceType.name,
+                                deviceCount = deviceCount,
+                                bufferSize = bufferSize,
+                                price = bufferPrice * bufferSize + deviceType.price * deviceCount,
+                                denyProbability = simulator.calculateDenyProbability(),
+                                averageUtilization = simulator.calculateAverageUtilization(),
+                                averageTimeSpent = simulator.calculateAverageTimeSpent()
+                            )
+                        })
+                    }
                 }
             }
-        }
-        return rows.joinToString(separator = "\n") {
+        }.mapIndexed { index, it -> it.await().also { println(index) } }
+        rows.joinToString(separator = "\n") {
             with(it) {
-                "$deviceTypeName,$deviceCount,$bufferSize,$price,$denyProbability,$averageUtilization,$averageTimeSpent"
+                "$deviceTypeName,$deviceCount,$bufferSize,$price," +
+                        "\"${denyProbability.toString().replace(".", ",")}\"," +
+                        "\"${averageUtilization.toString().replace(".", ",")}\"," +
+                        "\"${averageTimeSpent.toString().replace(".", ",")}\""
             }
         }
     }
