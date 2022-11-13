@@ -22,12 +22,12 @@ class Bruteforcer {
     )
 
     fun generateCsv(): String = runBlocking {
-        val bufferPrice = 2_000
+        val bufferPrice = 1_000
         val rows = buildList {
             for (deviceCount in 1..20) {
                 for (bufferSize in 1..20) {
                     for (deviceType in listOf(
-                        DeviceType("1", 0.5 to 0.75, 60_000),
+                        DeviceType("1", 0.5 to 0.75, 70_000),
                         DeviceType("2", 0.75 to 1.0, 50_000),
                         DeviceType("3", 1.0 to 1.25, 40_000)
                     )) {

@@ -1,5 +1,8 @@
 package ru.spbstu.architecture.simulation
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import ru.spbstu.architecture.ui.utils.IntRangeSerializer
 
@@ -17,17 +20,19 @@ class Plotter(private val config: Config) {
 
     private fun createPlots(
         configs: Sequence<Pair<Int, Simulator.Config>>
-    ): Result.Plots {
+    ): Result.Plots = runBlocking {
         val (averageUtilization, denyProbability, averageTimeSpent) = configs.map { (x, config) ->
-            AutoSimulator(config).simulate().run {
-                Triple(
-                    x to calculateAverageUtilization(),
-                    x to calculateDenyProbability(),
-                    x to calculateAverageTimeSpent()
-                )
+            async(Dispatchers.Default) {
+                AutoSimulator(config).simulate().run {
+                    Triple(
+                        x to calculateAverageUtilization(),
+                        x to calculateDenyProbability(),
+                        x to calculateAverageTimeSpent()
+                    )
+                }
             }
-        }.asIterable().unzip()
-        return Result.Plots(averageUtilization, denyProbability, averageTimeSpent)
+        }.toList().map { it.await() }.unzip()
+        Result.Plots(averageUtilization, denyProbability, averageTimeSpent)
     }
 
     data class Result(

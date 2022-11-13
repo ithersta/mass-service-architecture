@@ -23,6 +23,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-        Log.d("Bruteforcer", Bruteforcer().generateCsv())
     }
 }
