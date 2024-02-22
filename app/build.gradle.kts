@@ -1,18 +1,18 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp") version "1.7.10-1.0.6"
-    kotlin("plugin.serialization") version "1.7.10"
+    id("com.google.devtools.ksp")
+    kotlin("plugin.serialization")
 }
 
 android {
     namespace = "ru.spbstu.architecture"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "ru.spbstu.architecture"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -39,9 +39,9 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.0"
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
-    packagingOptions {
+    packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
@@ -56,20 +56,20 @@ android {
 }
 
 dependencies {
-    val composeVersion = "1.2.1"
+    val composeVersion = "1.6.1"
     val d2vVersion = "0.10.0"
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
-    implementation("androidx.activity:activity-compose:1.6.0")
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.activity:activity-compose:1.8.2")
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
-    implementation("androidx.compose.material3:material3:1.0.0-rc01")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+    implementation("androidx.compose.material3:material3:1.2.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("io.github.pt2121:collage:0.1.0-SNAPSHOT")
-    implementation("io.github.raamcosta.compose-destinations:core:1.6.20-beta")
+    implementation("io.github.raamcosta.compose-destinations:core:1.10.1")
     implementation("io.data2viz.d2v:d2v-axis:$d2vVersion")
-    ksp("io.github.raamcosta.compose-destinations:ksp:1.6.20-beta")
+    ksp("io.github.raamcosta.compose-destinations:ksp:1.10.1")
     debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
     debugImplementation("androidx.compose.ui:ui-test-manifest:$composeVersion")
 }

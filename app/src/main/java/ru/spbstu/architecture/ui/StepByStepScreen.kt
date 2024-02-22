@@ -6,7 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.with
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -45,12 +45,12 @@ import com.ramcosta.composedestinations.annotation.Destination
 import ru.spbstu.architecture.simulation.EventCalendar
 import ru.spbstu.architecture.simulation.Simulator
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Destination
 @Composable
 fun StepByStepScreen(
     config: Simulator.Config,
-    viewModel: StepByStepViewModel = viewModel { StepByStepViewModel(config) }
+    viewModel: StepByStepViewModel = viewModel { StepByStepViewModel(config) },
 ) {
     Scaffold(
         topBar = {
@@ -191,12 +191,17 @@ private fun RowScope.TimeCell(time: Double?, weight: Float) {
     AnimatedTableCell(text = time?.let { "%.4f".format(it) } ?: "–", weight = weight)
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun RowScope.AnimatedTableCell(text: String, weight: Float) {
-    AnimatedContent(targetState = text, modifier = Modifier.weight(weight), transitionSpec = {
-        fadeIn() + slideInVertically { -it / 2 } with fadeOut() + slideOutVertically { it / 2 }
-    }) {
+    AnimatedContent(
+        label = "AnimatedTableCell",
+        targetState = text,
+        modifier = Modifier.weight(weight),
+        transitionSpec = {
+            fadeIn() + slideInVertically { -it / 2 } togetherWith
+                    fadeOut() + slideOutVertically { it / 2 }
+        }
+    ) {
         Text(text = it)
     }
 }
