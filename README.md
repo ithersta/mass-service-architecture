@@ -10,4 +10,4 @@
 
 Разработка велась в рамках дисциплины «Архитектура программных систем» в СПбПУ.
 
-![Скриншоты](https://github.com/ithersta/mass-service-architecture/assets/34550623/90b845a2-6200-46d3-9801-c4d32540d199)
+![Скриншоты](https://github.com/ithersta/mass-service-architecture/assets/34550623/290d6cd3-26f9-47c2-b8ca-3b50fa47d675)
